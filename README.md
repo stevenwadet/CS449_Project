@@ -3,10 +3,10 @@ Project for my CS 449 class.
 
 ## Sprint #0 Report 
 
-Object-oriented proggramming language: Java
-GUI library: Swing
-IDE: Eclipse
-xUnit framework: JUnit
-Programming style guide: https://google.github.io/styleguide/javaguide.html
-Project hosting site: github.com
+Object-oriented proggramming language: Java\
+GUI library: Swing\
+IDE: Eclipse\
+xUnit framework: JUnit\
+Programming style guide: https://google.github.io/styleguide/javaguide.html \
+Project hosting site: github.com\
 
