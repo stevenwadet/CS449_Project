@@ -5,7 +5,7 @@ Project for my CS 449 class.
 
 ### Key Decisions of SOS Project
 
-Object-oriented proggramming language: Java\
+Object-oriented programming language: Java\
 GUI library: Swing\
 IDE: Eclipse\
 xUnit framework: JUnit\
