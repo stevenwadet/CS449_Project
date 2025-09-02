@@ -10,18 +10,18 @@ GUI library: Swing\
 IDE: Eclipse\
 xUnit framework: JUnit\
 Programming style guide: https://google.github.io/styleguide/javaguide.html \
-Project hosting site: github.com\
+Project hosting site: github.com
 
 ### Unit Testing
 
-**Screenshots:**\
+**Screenshots:**
 
-**Source Code:**\
+**Source Code:**
 
 ### GUI Programming
 
-**Screenshots:**\
+**Screenshots:**
 
-**Source Code:**\
+**Source Code:**
 
 
