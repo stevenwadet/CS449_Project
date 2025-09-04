@@ -14,12 +14,12 @@ public class SOSGame implements ActionListener{
 	JPanel leftPanel = new JPanel() //creating left panel
 ;	JLabel textfield = new JLabel(); //creating text
 	JButton[] buttons = new JButton[9]; //establishing 9 buttons for board
-	JRadioButton SimpleButton = new JRadioButton ("Simple Game"); //creating button for simple game
-	JRadioButton GeneralButton = new JRadioButton ("General Game"); //creating button for general game
+	JRadioButton simpleButton = new JRadioButton ("Simple Game"); //creating button for simple game
+	JRadioButton generalButton = new JRadioButton ("General Game"); //creating button for general game
 	JRadioButton sButton = new JRadioButton("S"); //creating radio button for S letter
 	JRadioButton oButton = new JRadioButton("O"); //creating radio button for O letter
-	JCheckBox RecordGame = new JCheckBox("Record Game"); //creating check box for S letter
-	ButtonGroup GameGroup = new ButtonGroup(); //creating new button group for game choice buttons
+	JCheckBox recordGame = new JCheckBox("Record Game"); //creating check box for S letter
+	ButtonGroup gameGroup = new ButtonGroup(); //creating new button group for game choice buttons
 	ButtonGroup choiceGroup = new ButtonGroup(); //creating a new button group for S or O choice buttons
 	boolean player1_turn; //establishing player turns
 	
@@ -57,14 +57,14 @@ public class SOSGame implements ActionListener{
 		
 		
 		//adding radio buttons to our game button group
-		GameGroup.add(SimpleButton);
-		SimpleButton.setSelected(true);
-		GameGroup.add(GeneralButton);
+		gameGroup.add(simpleButton);
+		simpleButton.setSelected(true);
+		gameGroup.add(generalButton);
 		
 		//adding buttons and check box to our bottom panel
-		bottomPanel.add(SimpleButton);
-		bottomPanel.add(GeneralButton);
-		bottomPanel.add(RecordGame);
+		bottomPanel.add(simpleButton);
+		bottomPanel.add(generalButton);
+		bottomPanel.add(recordGame);
 		
 		
 		for (int i=0;i<9;i++) {
