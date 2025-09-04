@@ -16,12 +16,17 @@ Project hosting site: github.com
 
 **Screenshots:**
 
-<img width="1420" height="352" alt="Screenshot 2025-09-02 at 2 31 48 PM" src="https://github.com/user-attachments/assets/a75e4688-0e10-40c7-8641-274b7ec53060" />
+<img width="299" height="361" alt="Screenshot 2025-09-04 at 10 26 06 AM" src="https://github.com/user-attachments/assets/4d37e311-7873-4c27-91eb-b6411ef445de" />
+
 
 
 **Source Code:**
 
-<img width="436" height="185" alt="Screenshot 2025-09-02 at 2 31 38 PM" src="https://github.com/user-attachments/assets/92f1a190-b7da-440d-83f6-dd60469e33bb" />
+<img width="280" height="210" alt="Screenshot 2025-09-04 at 10 25 39 AM" src="https://github.com/user-attachments/assets/ad196fcc-0b42-469a-97e3-1b221f9ead98" />
+
+<img width="674" height="327" alt="Screenshot 2025-09-04 at 10 25 53 AM" src="https://github.com/user-attachments/assets/7c08c986-5d31-44ee-ae79-0c83f5692e22" />
+
+
 
 
 
