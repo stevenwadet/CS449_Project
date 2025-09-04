@@ -11,8 +11,8 @@ public class SOSGame implements ActionListener{
 	JPanel title_panel = new JPanel(); //creating title panel
 	JPanel button_panel = new JPanel(); //creating button panel
 	JPanel bottomPanel = new JPanel(); //creating bottom panel
-	JPanel leftPanel = new JPanel() //creating left panel
-;	JLabel textfield = new JLabel(); //creating text
+	JPanel leftPanel = new JPanel(); //creating left panel
+	JLabel textfield = new JLabel(); //creating text
 	JButton[] buttons = new JButton[9]; //establishing 9 buttons for board
 	JRadioButton simpleButton = new JRadioButton ("Simple Game"); //creating button for simple game
 	JRadioButton generalButton = new JRadioButton ("General Game"); //creating button for general game
