@@ -37,6 +37,10 @@ Project hosting site: github.com
 
 **Screenshots:**
 
+<img width="798" height="767" alt="Screenshot 2025-09-04 at 2 25 41 PM" src="https://github.com/user-attachments/assets/705e6243-29a2-4664-a662-fae0c12cf590" />
+
+
 **Source Code:**
+
 
 
