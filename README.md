@@ -22,8 +22,11 @@ Project hosting site: github.com
 
 **Source Code:**
 
+
+"SumOfNumbers.java" file
 <img width="280" height="210" alt="Screenshot 2025-09-04 at 10 25 39 AM" src="https://github.com/user-attachments/assets/ad196fcc-0b42-469a-97e3-1b221f9ead98" />
 
+"SumOfNumbersTest.java" file
 <img width="674" height="327" alt="Screenshot 2025-09-04 at 10 25 53 AM" src="https://github.com/user-attachments/assets/7c08c986-5d31-44ee-ae79-0c83f5692e22" />
 
 
