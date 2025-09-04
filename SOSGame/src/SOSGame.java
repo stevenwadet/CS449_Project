@@ -111,7 +111,7 @@ public class SOSGame implements ActionListener{
 
 	                /*
 	                 * check(); 
-	                 * ^ this function will be implemented to check for SOS
+	                 * ^  function will be implemented to check for SOS
 	                 */
 	                
 	                
