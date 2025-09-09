@@ -16,7 +16,8 @@ Project hosting site: github.com
 
 **Screenshots:**
 
-<img width="299" height="361" alt="Screenshot 2025-09-04 at 10 26 06 AM" src="https://github.com/user-attachments/assets/4d37e311-7873-4c27-91eb-b6411ef445de" />
+<img width="330" height="256" alt="Screenshot 2025-09-04 at 4 01 03 PM" src="https://github.com/user-attachments/assets/aa2b874f-f2cf-4881-a3f0-9b898d56a531" />
+
 
 
 
@@ -27,7 +28,7 @@ Project hosting site: github.com
 <img width="280" height="210" alt="Screenshot 2025-09-04 at 10 25 39 AM" src="https://github.com/user-attachments/assets/ad196fcc-0b42-469a-97e3-1b221f9ead98" />
 
 "SumOfNumbersTest.java" file\
-<img width="674" height="327" alt="Screenshot 2025-09-04 at 10 25 53 AM" src="https://github.com/user-attachments/assets/7c08c986-5d31-44ee-ae79-0c83f5692e22" />
+<img width="735" height="417" alt="Screenshot 2025-09-04 at 4 01 30 PM" src="https://github.com/user-attachments/assets/6679661e-747a-4ca5-aa42-2d677066be14" />
 
 
 
@@ -42,5 +43,5 @@ Project hosting site: github.com
 
 **Source Code:**
 
-
+https://github.com/stevenwadet/CS449_Project/blob/0e5159d14fbb5da59b1a1589e42387f4ccb056b1/SOSGame/src/SOSGame.java#L1-L151
 
