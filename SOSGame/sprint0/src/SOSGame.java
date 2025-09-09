@@ -67,6 +67,8 @@ public class SOSGame implements ActionListener{
 		bottomPanel.add(recordGame);
 		
 		
+		//CODE BELOW WILL NEED TO BE EDITED FOR VARIABLE BOARD SIZE 
+		
 		for (int i=0;i<9;i++) {
 			buttons[i] = new JButton(); //create new button and assign it to i-th position in buttons array
 			button_panel.add(buttons[i]); //add button to the panel that holds the grid
@@ -74,6 +76,8 @@ public class SOSGame implements ActionListener{
 			buttons[i].setFocusable(false); //removes the focus border that sometimes appears
 			buttons[i].addActionListener(this); //adds ActionListener to button, allows game implementation
 		}
+		
+		//CODE ABOVE WILL NEED TO BE EDITED FOR VARIABLE BOARD SIZE 
 		
 		
 		title_panel.add(textfield); //adding text to title panel
