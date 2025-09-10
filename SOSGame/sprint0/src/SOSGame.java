@@ -86,7 +86,7 @@ public class SOSGame implements ActionListener{
 		frame.add(bottomPanel, BorderLayout.SOUTH); //setting position of bottom panel
 		frame.add(leftPanel, BorderLayout.WEST); //setting position of left panel
 		
-		firstTurn();
+		firstTurn(); //call first turn after fully setting up
 	}
 	
 	@Override
