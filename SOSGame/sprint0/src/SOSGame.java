@@ -91,8 +91,8 @@ public class SOSGame implements ActionListener{
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-	    for (int i = 0; i < buttons.length; i++) {
-	        if (e.getSource() == buttons[i]) {
+	    for (int i = 0; i < buttons.length; i++) {//looping through each panel in board grid
+	        if (e.getSource() == buttons[i]) { //checking to see which panel in board grid was selected by user
 	            
 	        	// Only allow placing on an empty button
 	            if (buttons[i].getText().equals("")) { 
