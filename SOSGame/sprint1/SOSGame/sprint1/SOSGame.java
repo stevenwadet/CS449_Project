@@ -142,7 +142,7 @@ public class SOSGame implements ActionListener{
 	private void createBoardFromTextField() {
 		try {
             int size = Integer.parseInt(boardSize.getText());//acquiring size from text field
-            if (size < 3) size = 3; //ensuring board is at least 2x2 (user can't enter 0 or 1)
+            if (size < 3) size = 3; //ensuring board is at least 3x3 (user can't enter < 3)
             currentBoardSize = size; //updating board size
             boardSize.setText(String.valueOf(currentBoardSize)); //update board size text field to 3
         } catch (NumberFormatException ex) { //if user types something that is not a number
