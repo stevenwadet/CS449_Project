@@ -2,30 +2,41 @@ package SOSGame.sprint1;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.Dimension;
 import java.util.*;
 import javax.swing.*;
+
+
 
 
 public class SOSGame implements ActionListener{
 	
 	Random random = new Random();
 	JFrame frame = new JFrame(); //creating new JFrame
+	
 	JPanel title_panel = new JPanel(); //creating title panel
 	JPanel button_panel = new JPanel(); //creating button panel
 	JPanel bottomPanel = new JPanel(); //creating bottom panel
 	JPanel leftPanel = new JPanel(); //creating left panel
 	JPanel rightPanel = new JPanel(); //creating right panel
+	JPanel boardSizePanel = new JPanel(); //creating panel for board size text and text field
+	
 	JLabel textfield = new JLabel(); //creating text
 	JButton[] buttons = new JButton[9]; //establishing 9 buttons for board (NEEDS CHANGE)
 	JButton newGameButton = new JButton("New Game"); //creating the new game button
-	JTextField boardSize = new JTextField("3-5"); //creating variable board size text field
+	JLabel boardSizeText = new JLabel("Board Size:");
+	JTextField boardSize = new JTextField(5); //creating variable board size text field
+	
+	
 	JRadioButton simpleButton = new JRadioButton ("Simple Game"); //creating button for simple game
 	JRadioButton generalButton = new JRadioButton ("General Game"); //creating button for general game
 	JRadioButton sButton = new JRadioButton("S"); //creating radio button for S letter
 	JRadioButton oButton = new JRadioButton("O"); //creating radio button for O letter
 	JCheckBox recordGame = new JCheckBox("Record Game"); //creating check box for S letter
+	
 	ButtonGroup gameGroup = new ButtonGroup(); //creating new button group for game choice buttons
 	ButtonGroup choiceGroup = new ButtonGroup(); //creating a new button group for S or O choice buttons
+	
 	boolean player1_turn; //establishing player turns
 	
 	
@@ -46,9 +57,23 @@ public class SOSGame implements ActionListener{
 		
 		title_panel.setLayout(new BorderLayout()); //establishing our title panel
 		title_panel.setBounds(0,0,800,100); //establishing the bounds for our title panel
+		title_panel.add(textfield); //adding text to title panel
+		frame.add(title_panel,BorderLayout.NORTH); //setting position of title panel
 		
 		button_panel.setLayout(new GridLayout(3,3)); //establishing our button panel to be a grid that is 3x3
 		button_panel.setBackground(new Color(150,150,150));
+		
+		//CODE BELOW WILL NEED TO BE EDITED FOR VARIABLE BOARD SIZE 
+		for (int i=0;i<9;i++) {
+			buttons[i] = new JButton(); //create new button and assign it to i-th position in buttons array
+			button_panel.add(buttons[i]); //add button to the panel that holds the grid
+			buttons[i].setFont(new Font("MV Boli", Font.BOLD, 120)); //set font for buttons
+			buttons[i].setFocusable(false); //removes the focus border that sometimes appears
+			buttons[i].addActionListener(this); //adds ActionListener to button, allows game implementation
+		}
+		//CODE ABOVE WILL NEED TO BE EDITED FOR VARIABLE BOARD SIZE 
+		frame.add(button_panel); //setting position of button panel
+		
 		
 		//adding our s and o buttons to our choice button group, setting S as default choice
 		choiceGroup.add(sButton);
@@ -59,6 +84,7 @@ public class SOSGame implements ActionListener{
 		leftPanel.setLayout(new GridLayout(2,1,10,10));
 		leftPanel.add(sButton);
 		leftPanel.add(oButton);
+		frame.add(leftPanel, BorderLayout.WEST); //setting position of left panel
 		
 		
 		//adding radio buttons to our game button group
@@ -70,36 +96,28 @@ public class SOSGame implements ActionListener{
 		bottomPanel.add(simpleButton);
 		bottomPanel.add(generalButton);
 		bottomPanel.add(recordGame);
+		frame.add(bottomPanel, BorderLayout.SOUTH); //setting position of bottom panel
 		
 		//adding new game and board size changer on right panel
-		rightPanel.setLayout(new GridLayout(2,1,10,10));
+		boardSizePanel.setLayout(new BoxLayout(boardSizePanel, BoxLayout.Y_AXIS));
+		boardSizeText.setAlignmentX(Component.CENTER_ALIGNMENT);
+		boardSize.setAlignmentX(Component.CENTER_ALIGNMENT);
+		boardSize.setPreferredSize(new Dimension(100, 25));
+        boardSize.setMaximumSize(new Dimension(100, 25));
+        boardSize.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		boardSizePanel.add(boardSizeText);
+		boardSizePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		boardSizePanel.add(boardSize);
+		
+		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+		newGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		rightPanel.add(newGameButton);
-		//add text above board size button
-		rightPanel.add(boardSize);
-		
-		
-		
-		//CODE BELOW WILL NEED TO BE EDITED FOR VARIABLE BOARD SIZE 
-		
-		for (int i=0;i<9;i++) {
-			buttons[i] = new JButton(); //create new button and assign it to i-th position in buttons array
-			button_panel.add(buttons[i]); //add button to the panel that holds the grid
-			buttons[i].setFont(new Font("MV Boli", Font.BOLD, 120)); //set font for buttons
-			buttons[i].setFocusable(false); //removes the focus border that sometimes appears
-			buttons[i].addActionListener(this); //adds ActionListener to button, allows game implementation
-		}
-		
-		//CODE ABOVE WILL NEED TO BE EDITED FOR VARIABLE BOARD SIZE 
-		
-		
-		title_panel.add(textfield); //adding text to title panel
-		frame.add(title_panel,BorderLayout.NORTH); //setting position of title panel
-		frame.add(button_panel); //setting position of button panel
-		frame.add(bottomPanel, BorderLayout.SOUTH); //setting position of bottom panel
-		frame.add(leftPanel, BorderLayout.WEST); //setting position of left panel
+		rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		rightPanel.add(boardSizePanel);
 		frame.add(rightPanel, BorderLayout.EAST);//setting position of right panel
 		
 		firstTurn(); //call first turn after fully setting up
+		frame.setVisible(true); // allowing the frame to be visible
 	}
 	
 	@Override
