@@ -5,6 +5,9 @@ import java.awt.event.*;
 import java.awt.Dimension;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.Timer;
+
+import java.util.Random;
 
 
 
@@ -22,7 +25,7 @@ public class SOSGame implements ActionListener{
 	JPanel boardSizePanel = new JPanel(); //creating panel for board size text and text field
 	
 	JLabel textfield = new JLabel(); //creating text
-	JButton[] buttons = new JButton[9]; //establishing 9 buttons for board (NEEDS CHANGE)
+	JButton[] buttons; //establishing 9 buttons for board (NEEDS CHANGE)
 	JButton newGameButton = new JButton("New Game"); //creating the new game button
 	JLabel boardSizeText = new JLabel("Board Size:");
 	JTextField boardSize = new JTextField(5); //creating variable board size text field
@@ -38,6 +41,7 @@ public class SOSGame implements ActionListener{
 	ButtonGroup choiceGroup = new ButtonGroup(); //creating a new button group for S or O choice buttons
 	
 	boolean player1_turn; //establishing player turns
+	int currentBoardSize = 3; //default board size
 	
 	
 	SOSGame(){
@@ -46,7 +50,6 @@ public class SOSGame implements ActionListener{
 		frame.setSize(800, 800); //setting size of frame
 		frame.getContentPane().setBackground(new Color(50,50,50)); //set background color
 		frame.setLayout(new BorderLayout());
-		frame.setVisible(true); // allowing the frame to be visible
 		
 		textfield.setBackground(new Color(25,25,25)); //setting background color for text = black
 		textfield.setForeground(new Color(25,255,0)); //setting color of text = green
@@ -59,20 +62,6 @@ public class SOSGame implements ActionListener{
 		title_panel.setBounds(0,0,800,100); //establishing the bounds for our title panel
 		title_panel.add(textfield); //adding text to title panel
 		frame.add(title_panel,BorderLayout.NORTH); //setting position of title panel
-		
-		button_panel.setLayout(new GridLayout(3,3)); //establishing our button panel to be a grid that is 3x3
-		button_panel.setBackground(new Color(150,150,150));
-		
-		//CODE BELOW WILL NEED TO BE EDITED FOR VARIABLE BOARD SIZE 
-		for (int i=0;i<9;i++) {
-			buttons[i] = new JButton(); //create new button and assign it to i-th position in buttons array
-			button_panel.add(buttons[i]); //add button to the panel that holds the grid
-			buttons[i].setFont(new Font("MV Boli", Font.BOLD, 120)); //set font for buttons
-			buttons[i].setFocusable(false); //removes the focus border that sometimes appears
-			buttons[i].addActionListener(this); //adds ActionListener to button, allows game implementation
-		}
-		//CODE ABOVE WILL NEED TO BE EDITED FOR VARIABLE BOARD SIZE 
-		frame.add(button_panel); //setting position of button panel
 		
 		
 		//adding our s and o buttons to our choice button group, setting S as default choice
@@ -101,81 +90,117 @@ public class SOSGame implements ActionListener{
 		//adding new game and board size changer on right panel
 		boardSizePanel.setLayout(new BoxLayout(boardSizePanel, BoxLayout.Y_AXIS));
 		boardSizeText.setAlignmentX(Component.CENTER_ALIGNMENT);
-		boardSize.setAlignmentX(Component.CENTER_ALIGNMENT);
-		boardSize.setPreferredSize(new Dimension(100, 25));
-        boardSize.setMaximumSize(new Dimension(100, 25));
-        boardSize.setFont(new Font("SansSerif", Font.PLAIN, 12));
-		boardSizePanel.add(boardSizeText);
-		boardSizePanel.add(Box.createRigidArea(new Dimension(0, 5)));
-		boardSizePanel.add(boardSize);
+		
+		boardSize.setAlignmentX(Component.CENTER_ALIGNMENT);//centering text field in panel
+		boardSize.setPreferredSize(new Dimension(100, 25)); //suggests default size
+        boardSize.setMaximumSize(new Dimension(100, 25)); //text field max size
+        boardSize.setFont(new Font("SansSerif", Font.PLAIN, 12));//text field font
+        boardSize.setText(String.valueOf(currentBoardSize));//sets initial value of text field to current board size
+        
+		boardSizePanel.add(boardSizeText);//adding boardSizeText to board size panel
+		boardSizePanel.add(Box.createRigidArea(new Dimension(0, 5)));//adds a gap to separate label and text field
+		boardSizePanel.add(boardSize);//add text field below label
 		
 		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-		newGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		rightPanel.add(newGameButton);
-		rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-		rightPanel.add(boardSizePanel);
+		newGameButton.setAlignmentX(Component.CENTER_ALIGNMENT); //center new game button horizontally in rightPanel
+		rightPanel.add(newGameButton);// add new game button to panel
+		rightPanel.add(Box.createRigidArea(new Dimension(0, 10))); // add vertical gap
+		rightPanel.add(boardSizePanel); //add panel containing board size label and text field
 		frame.add(rightPanel, BorderLayout.EAST);//setting position of right panel
+		
+		newGameButton.addActionListener(e -> createBoardFromTextField()); //action listener for new game button
+		
+		createBoard(currentBoardSize);//create game board
 		
 		firstTurn(); //call first turn after fully setting up
 		frame.setVisible(true); // allowing the frame to be visible
 	}
 	
+	private void createBoard(int size) {
+		button_panel.removeAll();//removing all old buttons
+		button_panel.setLayout(new GridLayout(size, size, 2, 2));//establishing new grid 
+		buttons = new JButton[size * size]; //creating new buttons
+		
+		for (int i = 0; i < buttons.length; i++) {
+			buttons[i] = new JButton();//create new button
+			buttons[i].setFont(new Font("MV Boli", Font.BOLD, 120 / Math.max(size, 3)));
+            buttons[i].setFocusable(false);
+            buttons[i].addActionListener(this);
+            button_panel.add(buttons[i]);//add new button to button panel
+		}
+		
+		
+		//making sure button is in the frame
+		if (button_panel.getParent() == null) {
+			frame.add(button_panel, BorderLayout.CENTER);
+		}
+		
+		button_panel.revalidate();//forces panel to re-run layout manager, since it doesn't do it automatically
+		button_panel.repaint();//redraw the panel
+	}
+	
+	private void createBoardFromTextField() {
+		try {
+            int size = Integer.parseInt(boardSize.getText());//acquiring size from text field
+            if (size < 3) size = 3; //ensuring board is at least 2x2 (user can't enter 0 or 1)
+            currentBoardSize = size; //updating board size
+            boardSize.setText(String.valueOf(currentBoardSize)); //update board size text field to 3
+        } catch (NumberFormatException ex) { //if user types something that is not a number
+            currentBoardSize = 3; //set to default value of 3
+            boardSize.setText(String.valueOf(currentBoardSize)); //update board size text field to 3
+        }
+        createBoard(currentBoardSize);//create game board
+        firstTurn(); //call first turn
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 	    for (int i = 0; i < buttons.length; i++) {//looping through each panel in board grid
-	        if (e.getSource() == buttons[i]) { //checking to see which panel in board grid was selected by user
-	            
-	        	// Only allow placing on an empty button
-	            if (buttons[i].getText().equals("")) { 
-	                
-	                
-	                String letter = sButton.isSelected() ? "S" : "O"; // Determine which letter is selected
-
-	                // Set the text and color depending on the current player
-	                if (player1_turn) {
-	                    buttons[i].setForeground(new Color(0, 0, 255)); // Blue player
-	                    buttons[i].setText(letter);
-	                    player1_turn = false; //set turn to red player
-	                    textfield.setText("Red Player's Turn"); //change text to reflect the change in turn
-	                } else {
-	                    buttons[i].setForeground(new Color(255, 0, 0)); // Red player
-	                    buttons[i].setText(letter);
-	                    player1_turn = true; //set turn to blue player
-	                    textfield.setText("Blue Player's Turn"); //change text to reflect change in turn
-	                }
-
-	                /*
-	                 * check(); 
-	                 * ^ this function will be implemented to check for SOS
-	                 */
+	        if (e.getSource() == buttons[i] && buttons[i].getText().equals("")) { //checking to see which panel in board grid was selected by user
+	           
+	            String letter = sButton.isSelected() ? "S" : "O"; // Determine which letter is selected, assistance from ChatGPT
+	
+	            // Set the text and color depending on the current player
+	            if (player1_turn) {
+	                buttons[i].setForeground(new Color(0, 0, 255)); // Blue player
+	                buttons[i].setText(letter);
+	                player1_turn = false; //set turn to red player
+	                textfield.setText("Red Player's Turn"); //change text to reflect the change in turn
+	            } else {
+	                buttons[i].setForeground(new Color(255, 0, 0)); // Red player
+	                buttons[i].setText(letter);
+	                player1_turn = true; //set turn to blue player
+	                textfield.setText("Blue Player's Turn"); //change text to reflect change in turn
+	            }
+	
+	            /*
+	             * check(); 
+	             * ^ this function will be implemented to check for SOS
+	             */
 	                
 	                
 	            }
 	        }
 	    }
-	}
-
 	
+
 	public void firstTurn() {
 		
 		//the following try catch blocks allow us to flash the game title, then have the text be replaced by text of whoever's turn it is
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//the following if,else randomly selects a player for the first turn
-		if(random.nextInt(2)==0) {
-			player1_turn=true;
-			textfield.setText("Blue Player's Turn");
-		}
-		else {
-			player1_turn=false;
-			textfield.setText("Red Player's Turn");
-			
-		}
+		// Show "SOS Game" for 0.5s, then switch to player's turn
+		//assistance from ChatGPT
+        textfield.setText("SOS Game");
+        Timer t = new Timer(500, e -> {
+            if(random.nextInt(2)==0) {
+                player1_turn = true;
+                textfield.setText("Blue Player's Turn");
+            } else {
+                player1_turn = false;
+                textfield.setText("Red Player's Turn");
+            }
+        });
+        t.setRepeats(false);
+        t.start();
 	}
 	
 
