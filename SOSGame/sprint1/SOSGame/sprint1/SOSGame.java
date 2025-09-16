@@ -14,8 +14,11 @@ public class SOSGame implements ActionListener{
 	JPanel button_panel = new JPanel(); //creating button panel
 	JPanel bottomPanel = new JPanel(); //creating bottom panel
 	JPanel leftPanel = new JPanel(); //creating left panel
+	JPanel rightPanel = new JPanel(); //creating right panel
 	JLabel textfield = new JLabel(); //creating text
-	JButton[] buttons = new JButton[9]; //establishing 9 buttons for board
+	JButton[] buttons = new JButton[9]; //establishing 9 buttons for board (NEEDS CHANGE)
+	JButton newGameButton = new JButton("New Game"); //creating the new game button
+	JTextField boardSize = new JTextField("3-5"); //creating variable board size text field
 	JRadioButton simpleButton = new JRadioButton ("Simple Game"); //creating button for simple game
 	JRadioButton generalButton = new JRadioButton ("General Game"); //creating button for general game
 	JRadioButton sButton = new JRadioButton("S"); //creating radio button for S letter
@@ -68,6 +71,13 @@ public class SOSGame implements ActionListener{
 		bottomPanel.add(generalButton);
 		bottomPanel.add(recordGame);
 		
+		//adding new game and board size changer on right panel
+		rightPanel.setLayout(new GridLayout(2,1,10,10));
+		rightPanel.add(newGameButton);
+		//add text above board size button
+		rightPanel.add(boardSize);
+		
+		
 		
 		//CODE BELOW WILL NEED TO BE EDITED FOR VARIABLE BOARD SIZE 
 		
@@ -87,6 +97,7 @@ public class SOSGame implements ActionListener{
 		frame.add(button_panel); //setting position of button panel
 		frame.add(bottomPanel, BorderLayout.SOUTH); //setting position of bottom panel
 		frame.add(leftPanel, BorderLayout.WEST); //setting position of left panel
+		frame.add(rightPanel, BorderLayout.EAST);//setting position of right panel
 		
 		firstTurn(); //call first turn after fully setting up
 	}
