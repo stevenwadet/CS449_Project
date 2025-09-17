@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
 
 import java.util.Random;
 
@@ -27,7 +28,7 @@ public class SOSGame implements ActionListener{
 	JLabel textfield = new JLabel(); //creating text
 	JButton[] buttons; //establishing 9 buttons for board (NEEDS CHANGE)
 	JButton newGameButton = new JButton("New Game"); //creating the new game button
-	JLabel boardSizeText = new JLabel("Board Size:");
+	JLabel boardSizeText = new JLabel("Board Size (3-10):");
 	JTextField boardSize = new JTextField(5); //creating variable board size text field
 	
 	
@@ -89,11 +90,14 @@ public class SOSGame implements ActionListener{
 		
 		//adding new game and board size changer on right panel
 		boardSizePanel.setLayout(new BoxLayout(boardSizePanel, BoxLayout.Y_AXIS));
-		boardSizeText.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		boardSizeText.setAlignmentX(Component.CENTER_ALIGNMENT); //center text
+		boardSizeText.setBorder(new EmptyBorder(0, 10, 0, 10)); //add padding around text for nicer looks
 		
 		boardSize.setAlignmentX(Component.CENTER_ALIGNMENT);//centering text field in panel
-		boardSize.setPreferredSize(new Dimension(100, 25)); //suggests default size
-        boardSize.setMaximumSize(new Dimension(100, 25)); //text field max size
+		boardSize.setHorizontalAlignment(JTextField.CENTER);
+		boardSize.setPreferredSize(new Dimension(110, 25)); //suggests default size
+        boardSize.setMaximumSize(new Dimension(110, 25)); //text field max size
         boardSize.setFont(new Font("SansSerif", Font.PLAIN, 12));//text field font
         boardSize.setText(String.valueOf(currentBoardSize));//sets initial value of text field to current board size
         
@@ -142,7 +146,7 @@ public class SOSGame implements ActionListener{
 	private void createBoardFromTextField() {
 		try {
             int size = Integer.parseInt(boardSize.getText());//acquiring size from text field
-            if (size < 3) size = 3; //ensuring board is at least 3x3 (user can't enter < 3)
+            if (size < 3 || size > 10 ) size = 3; //ensuring board is at least 3x3 (user can't enter < 3)
             currentBoardSize = size; //updating board size
             boardSize.setText(String.valueOf(currentBoardSize)); //update board size text field to 3
         } catch (NumberFormatException ex) { //if user types something that is not a number
@@ -190,7 +194,7 @@ public class SOSGame implements ActionListener{
 		// Show "SOS Game" for 0.5s, then switch to player's turn
 		//assistance from ChatGPT
         textfield.setText("SOS Game");
-        Timer t = new Timer(500, e -> {
+        Timer t = new Timer(1000, e -> {
             if(random.nextInt(2)==0) {
                 player1_turn = true;
                 textfield.setText("Blue Player's Turn");
