@@ -15,9 +15,10 @@ import java.util.Random;
 
 public class SOSGame implements ActionListener{
 	
+	private Game game; //reference to game logic
+	
 	Random random = new Random();
 	JFrame frame = new JFrame(); //creating new JFrame
-	
 	JPanel title_panel = new JPanel(); //creating title panel
 	JPanel button_panel = new JPanel(); //creating button panel
 	JPanel bottomPanel = new JPanel(); //creating bottom panel
@@ -40,15 +41,15 @@ public class SOSGame implements ActionListener{
 	
 	ButtonGroup gameGroup = new ButtonGroup(); //creating new button group for game choice buttons
 	ButtonGroup choiceGroup = new ButtonGroup(); //creating a new button group for S or O choice buttons
-	
-	boolean player1_turn; //establishing player turns
 	int currentBoardSize = 3; //default board size
 	
 	
-	SOSGame(){
+	SOSGame(Game game){
+		this.game = game;
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //NEEDED, app will not close when clicking red X without this line
 		frame.setSize(800, 800); //setting size of frame
+		frame.setMinimumSize(new Dimension(1100, 800)); //ensures title flash fits
 		frame.getContentPane().setBackground(new Color(50,50,50)); //set background color
 		frame.setLayout(new BorderLayout());
 		
@@ -112,10 +113,36 @@ public class SOSGame implements ActionListener{
 		rightPanel.add(boardSizePanel); //add panel containing board size label and text field
 		frame.add(rightPanel, BorderLayout.EAST);//setting position of right panel
 		
-		newGameButton.addActionListener(e -> createBoardFromTextField()); //action listener for new game button
+		newGameButton.addActionListener(e -> {
+			int size;
+			try {
+	            size = Integer.parseInt(boardSize.getText());//acquiring size from text field
+	            if (size < 3 || size > 10 ) size = 3; //ensuring board is at least 3x3 and no larger than 10x10 (user can't enter < 3 or > 10)
+	        } catch (NumberFormatException ex) { //if user types something that is not a number
+	            size = 3;
+	        }
+			
+			
+			boardSize.setText(String.valueOf(size));
+			currentBoardSize = size; //setting board size
+			
+			//create either SimpleGame or GeneralGame
+			if (simpleButton.isSelected()) {
+				this.game = new SimpleGame(size);
+			}
+			else {
+				this.game = new GeneralGame(size);
+			}
+			
+			
+			
+			
+	        createBoard(currentBoardSize);//create new game board
+	        firstTurn(); //call first turn
+		});
 		
-		createBoard(currentBoardSize);//create game board
 		
+		createBoard(currentBoardSize);//create initial game board
 		firstTurn(); //call first turn after fully setting up
 		frame.setVisible(true); // allowing the frame to be visible
 	}
@@ -142,66 +169,57 @@ public class SOSGame implements ActionListener{
 		button_panel.revalidate();//forces panel to re-run layout manager, since it doesn't do it automatically
 		button_panel.repaint();//redraw the panel
 	}
-	
-	private void createBoardFromTextField() {
-		try {
-            int size = Integer.parseInt(boardSize.getText());//acquiring size from text field
-            if (size < 3 || size > 10 ) size = 3; //ensuring board is at least 3x3 (user can't enter < 3)
-            currentBoardSize = size; //updating board size
-            boardSize.setText(String.valueOf(currentBoardSize)); //update board size text field to 3
-        } catch (NumberFormatException ex) { //if user types something that is not a number
-            currentBoardSize = 3; //set to default value of 3
-            boardSize.setText(String.valueOf(currentBoardSize)); //update board size text field to 3
-        }
-        createBoard(currentBoardSize);//create game board
-        firstTurn(); //call first turn
-	}
+
 	
 	@Override
-	public void actionPerformed(ActionEvent e) {
-	    for (int i = 0; i < buttons.length; i++) {//looping through each panel in board grid
-	        if (e.getSource() == buttons[i] && buttons[i].getText().equals("")) { //checking to see which panel in board grid was selected by user
-	           
-	            String letter = sButton.isSelected() ? "S" : "O"; // Determine which letter is selected, assistance from ChatGPT
-	
-	            // Set the text and color depending on the current player
-	            if (player1_turn) {
-	                buttons[i].setForeground(new Color(0, 0, 255)); // Blue player
+	public void actionPerformed(ActionEvent e) {	
+	    for (int i = 0; i < buttons.length; i++) {
+	        if (e.getSource() == buttons[i] && buttons[i].getText().equals("")) {
+
+	            String letter = sButton.isSelected() ? "S" : "O"; 
+	            int row = i / currentBoardSize;
+	            int col = i % currentBoardSize;
+	            
+	            
+	            //who's turn is it?
+	            boolean currentPlayer = game.isPlayer1Turn();
+	            
+	            // Make the move using Game.makeMove (handles placement and turn)
+	            Game.MoveResult result = game.makeMove(row, col, letter.charAt(0));
+
+	            if (result.moveMade) { 
+	                // Update GUI
 	                buttons[i].setText(letter);
-	                player1_turn = false; //set turn to red player
-	                textfield.setText("Red Player's Turn"); //change text to reflect the change in turn
-	            } else {
-	                buttons[i].setForeground(new Color(255, 0, 0)); // Red player
-	                buttons[i].setText(letter);
-	                player1_turn = true; //set turn to blue player
-	                textfield.setText("Blue Player's Turn"); //change text to reflect change in turn
-	            }
-	
-	            /*
-	             * check(); 
-	             * ^ this function will be implemented to check for SOS
-	             */
-	                
-	                
+	                buttons[i].setForeground(currentPlayer ? Color.BLUE : Color.RED);
+
+	                // Update score if GeneralGame
+	                if (game instanceof GeneralGame) {
+	                    ((GeneralGame) game).updateScore(row, col);
+	                }
+
+	                // Update turn text or show winner
+	                if (result.gameOver) {
+	                    textfield.setText(result.winner);
+	                    for (JButton btn : buttons) btn.setEnabled(false);
+	                } else {
+	                    textfield.setText(result.nextPlayerIs1 ? "Blue Player's Turn" : "Red Player's Turn");
+	                }
 	            }
 	        }
 	    }
+	}
+
 	
 
 	public void firstTurn() {
-		
-		//the following try catch blocks allow us to flash the game title, then have the text be replaced by text of whoever's turn it is
+
 		// Show "SOS Game" for 0.5s, then switch to player's turn
 		//assistance from ChatGPT
-        textfield.setText("SOS Game");
+		String gameType = simpleButton.isSelected() ? "Simple Game" : "General Game";
+        textfield.setText("SOS Game - " + gameType);
+        
         Timer t = new Timer(1000, e -> {
-            if(random.nextInt(2)==0) {
-                player1_turn = true;
-                textfield.setText("Blue Player's Turn");
-            } else {
-                player1_turn = false;
-                textfield.setText("Red Player's Turn");
-            }
+        	textfield.setText(game.isPlayer1Turn() ? "Blue Player's Turn" : "Red Player's Turn");
         });
         t.setRepeats(false);
         t.start();
@@ -209,7 +227,7 @@ public class SOSGame implements ActionListener{
 	
 
 	public static void main(String[] args) {
-	   SOSGame game =  new SOSGame(); // create an instance to show the GUI
+	   new SOSGame(new SimpleGame(3)) ;// create an instance to show the GUI
 	}
 
 }
