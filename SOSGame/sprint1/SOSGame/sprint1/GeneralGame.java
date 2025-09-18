@@ -97,8 +97,4 @@ public class GeneralGame extends Game {
 		return r>= 0 && r < size && c >= 0 && c < size;
 	}
 	
-
-	
-	
-
 }

@@ -80,6 +80,7 @@ public abstract class Game {
 	    return result;
 	}
 	
+	
 	public abstract boolean checkGameOver();// each subclass has to implement its own version
 	public abstract String getWinner();// each subclass has to implement its own version
 }

@@ -113,6 +113,7 @@ public class SOSGame implements ActionListener{
 		rightPanel.add(boardSizePanel); //add panel containing board size label and text field
 		frame.add(rightPanel, BorderLayout.EAST);//setting position of right panel
 		
+		
 		newGameButton.addActionListener(e -> {
 			int size;
 			try {
@@ -123,7 +124,7 @@ public class SOSGame implements ActionListener{
 	        }
 			
 			
-			boardSize.setText(String.valueOf(size));
+			boardSize.setText(String.valueOf(size));//updates board size field
 			currentBoardSize = size; //setting board size
 			
 			//create either SimpleGame or GeneralGame
@@ -147,13 +148,69 @@ public class SOSGame implements ActionListener{
 		frame.setVisible(true); // allowing the frame to be visible
 	}
 	
+	class SOSButton extends JButton {
+		private boolean drawLine = false;
+		private int lineType = -1; // 0=horizontal, 1=vertical, 2=diagRight, 3=diagLeft
+		private Color lineColor = Color.black;
+		
+		SOSButton () {
+			super();
+			setOpaque(true);
+			setBorder(BorderFactory.createLineBorder(Color.GRAY));
+			setFont(new Font("MV Boli", Font.BOLD, 40));
+		}
+		
+		public void markSOS(int type, Color color) {
+			this.drawLine = true;
+			this.lineType = type;
+			this.lineColor = color;
+			repaint(); //force redraw
+		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			
+			if (drawLine) { //only draw line if drawLine flag is true
+				Graphics2D g2 = (Graphics2D) g;
+				g2.setStroke(new BasicStroke(4)); //set thickness of line to 4 pixels
+				g2.setColor(lineColor); //set color of line
+				
+				int w = getWidth(); //get width of button
+				int h = getHeight(); //get height of button
+				
+				// draw a line based on SOS
+				switch (lineType) {
+					//horizontal
+					case 0: 
+						g2.drawLine(5, h/2, w-5, h/2); 
+						break; 
+						
+					// vertical
+	                case 1: 
+	                	g2.drawLine(w/2, 5, w/2, h-5); 
+	                	break; 
+	                
+	                // diagonal down-right
+	                case 2: 
+	                	g2.drawLine(5, 5, w-5, h-5); 
+	                	break;
+	                	
+	                // diagonal down-left	
+	                case 3: 
+	                	g2.drawLine(w-5, 5, 5, h-5); 
+	                	break; 
+				}
+			}
+		}
+	}
 	private void createBoard(int size) {
 		button_panel.removeAll();//removing all old buttons
 		button_panel.setLayout(new GridLayout(size, size, 2, 2));//establishing new grid 
-		buttons = new JButton[size * size]; //creating new buttons
+		buttons = new SOSButton[size * size]; //creating new buttons
 		
 		for (int i = 0; i < buttons.length; i++) {
-			buttons[i] = new JButton();//create new button
+			buttons[i] = new SOSButton();//create new button
 			buttons[i].setFont(new Font("MV Boli", Font.BOLD, 120 / Math.max(size, 3)));
             buttons[i].setFocusable(false);
             buttons[i].addActionListener(this);
@@ -173,8 +230,8 @@ public class SOSGame implements ActionListener{
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {	
-	    for (int i = 0; i < buttons.length; i++) {
-	        if (e.getSource() == buttons[i] && buttons[i].getText().equals("")) {
+	    for (int i = 0; i < buttons.length; i++) { //loop through each button
+	        if (e.getSource() == buttons[i] && buttons[i].getText().equals("")) { 
 
 	            String letter = sButton.isSelected() ? "S" : "O"; 
 	            int row = i / currentBoardSize;
@@ -188,7 +245,7 @@ public class SOSGame implements ActionListener{
 	            Game.MoveResult result = game.makeMove(row, col, letter.charAt(0));
 
 	            if (result.moveMade) { 
-	                // Update GUI
+	                // Update GUI to appropriate letter and color
 	                buttons[i].setText(letter);
 	                buttons[i].setForeground(currentPlayer ? Color.BLUE : Color.RED);
 
@@ -198,11 +255,31 @@ public class SOSGame implements ActionListener{
 	                }
 
 	                // Update turn text or show winner
-	                if (result.gameOver) {
-	                    textfield.setText(result.winner);
+	                if (result.gameOver) { //if game over
+	                    textfield.setText(result.winner); //set text to congratulate winner
 	                    for (JButton btn : buttons) btn.setEnabled(false);
-	                } else {
-	                    textfield.setText(result.nextPlayerIs1 ? "Blue Player's Turn" : "Red Player's Turn");
+	                    
+	                 // If this is SimpleGame, draw the SOS line
+	                    if (game instanceof SimpleGame) {
+	                        SimpleGame.SOSInfo sos = ((SimpleGame) game).getLastSOS();
+	                        if (sos != null) { //if we have an SOS
+	                            Color lineColor = (sos.player == 1) ? Color.BLUE : Color.RED; //set line color = color of player
+	                            
+	                            // r[0] c[0] == first S
+	                            // r[1] c[1] == middle O
+	                            // r[2] c[2] == final S
+	                            int[] r = {sos.r1, sos.r2, sos.r3};
+	                            int[] c = {sos.c1, sos.c2, sos.c3};
+	                            for (int j = 0; j < 3; j++) {
+	                            	//get button in GUI corresponding to this cell of SOS
+	                                SOSButton btn = (SOSButton) buttons[r[j] * currentBoardSize + c[j]];
+	                                btn.markSOS(sos.direction, lineColor);
+	                            }
+	                        }
+	                    }
+	                    
+	                } else { //if game not over, set turn text
+	                    textfield.setText(result.nextPlayerIs1 ? "Blue Player's Turn" : "Red Player's Turn"); 
 	                }
 	            }
 	        }
@@ -227,7 +304,7 @@ public class SOSGame implements ActionListener{
 	
 
 	public static void main(String[] args) {
-	   new SOSGame(new SimpleGame(3)) ;// create an instance to show the GUI
+	   new SOSGame(new SimpleGame(3)) ;// create an instance, default settings are a simple game with 3x3 grid
 	}
 
 }
