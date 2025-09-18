@@ -76,7 +76,7 @@ public class GeneralGame extends Game {
 			
 			//current letter is 'S' = check for SOS
 			if (letter == 'S') {
-				int r1 = row +dr;
+				int r1 = row + dr;
 				int c1 = col + dc;
 				int r2 = row + 2*dr;
 				int c2 = col + 2*dc;

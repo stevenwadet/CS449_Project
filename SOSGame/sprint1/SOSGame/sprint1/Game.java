@@ -6,13 +6,19 @@ public abstract class Game {
 	protected int size;
 	protected char[][] board;
 	protected int[][] ownerBoard; // 0 = empty, 1 = player1, 2 = player2
+	/*
+	 * ex of owner board:
+	 *  [1, 0, 2],  // row 0: Player 1, empty, Player 2
+  		[0, 1, 0],  // row 1: empty, Player 1, empty
+  		[2, 0, 1]   // row 2: Player 2, empty, Player 1
+	 */
 	protected boolean player1Turn;
 	
 	public Game(int size) {
 		this.size = size;
-		this.board = new char [size][size];
+		this.board = new char[size][size];
 		Random random = new Random();
-		this.player1Turn = random.nextBoolean(); 
+		this.player1Turn = random.nextBoolean(); //random first player turn
 		ownerBoard = new int[size][size];
 		for (int r = 0; r < size; r++) {
 		    for (int c = 0; c < size; c++) {

@@ -41,11 +41,12 @@ public class SimpleGame extends Game {
 			for (int c = 0; c < size; c++) {
 				if (board[r][c] == 'S') {
 					int player = ownerBoard[r][c]; //who placed this S?
-					if(player == 0) {
+					if(player == 0) { //if cell empty, skip SOS check
 						continue;
 					}
 					
 					// horizontal
+					//ownerBoard checks are to make sure SOS is made by same player
                     if (c + 2 < size && board[r][c+1] == 'O' && board[r][c+2] == 'S' &&
                         ownerBoard[r][c+1] == player && ownerBoard[r][c+2] == player) return player;
 
