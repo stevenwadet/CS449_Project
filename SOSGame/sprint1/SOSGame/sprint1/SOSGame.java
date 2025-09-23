@@ -194,7 +194,7 @@ public class SOSGame implements ActionListener{
 
 	    public void addLine(SOSLine line) {
 	        lines.add(line);
-	        repaint();
+	        repaint(); //repaint immediately after adding a line
 	    }
 
 	    public void clearLines() {
@@ -210,12 +210,17 @@ public class SOSGame implements ActionListener{
 
 	        for (SOSLine line : lines) {
 	            g2.setColor(line.color);
-
-	            // Calculate centers of start and end buttons
-	            int startX = line.startCol * getWidth() / currentBoardSize + getWidth() / (2 * currentBoardSize);
-	            int startY = line.startRow * getHeight() / currentBoardSize + getHeight() / (2 * currentBoardSize);
-	            int endX = line.endCol * getWidth() / currentBoardSize + getWidth() / (2 * currentBoardSize);
-	            int endY = line.endRow * getHeight() / currentBoardSize + getHeight() / (2 * currentBoardSize);
+	            
+	            
+	            //get buttons
+	            JButton startButton = buttons[line.startRow * currentBoardSize + line.startCol];
+	            JButton endButton   = buttons[line.endRow * currentBoardSize + line.endCol];
+	            
+	            // Calculate centers of buttons
+	            int startX = startButton.getX() + startButton.getWidth() / 2;
+	            int startY = startButton.getY() + startButton.getHeight() / 2;
+	            int endX = endButton.getX() + endButton.getWidth() / 2;
+	            int endY = endButton.getY() + endButton.getHeight() / 2;
 
 	            g2.drawLine(startX, startY, endX, endY);
 	        }
@@ -238,11 +243,15 @@ public class SOSGame implements ActionListener{
 		button_panel.revalidate();
 	    button_panel.repaint();
 
-	    // make sure overlay covers new buttons
-	    lineOverlay1.setBounds(button_panel.getBounds());
-	    lineOverlay1.clearLines();
-	    lineOverlay1.revalidate();
-	    lineOverlay1.repaint();
+	    
+	    // ensure LineOverlay covers buttons after layout
+	    SwingUtilities.invokeLater(() -> {
+	    	lineOverlay1.setBounds(button_panel.getBounds());
+		    lineOverlay1.clearLines();
+		    lineOverlay1.revalidate();
+		    lineOverlay1.repaint();
+	    });
+	    
 	}
 
 	
@@ -274,7 +283,6 @@ public class SOSGame implements ActionListener{
 	                // Update score and draw SOS lines if GeneralGame
 	                if (game instanceof GeneralGame) {
 	                    GeneralGame gg = (GeneralGame) game;
-	                    
 	                    List<GeneralGame.SOSInfo> sosList = gg.getLastSOSList();
 	                    if (sosList != null) {
 	                    	for (GeneralGame.SOSInfo sos : sosList) {

@@ -15,6 +15,7 @@ public class SimpleGame extends Game {
 		super(size);
 	}
 	
+	//checks if board is fully occupied
 	public boolean isBoardFull() {
 		for (int r = 0; r < size; r++) {
 			for (int c = 0; c < size; c++) {
@@ -31,15 +32,15 @@ public class SimpleGame extends Game {
 		if (gameOver) return true;
 		
 		SOSInfo sos = findSOS(); //find any SOS on board
-		if (sos != null) {
+		if (sos != null) { //if we have an SOS
 			gameOver = true;
 			winnerIsPlayer1 = (sos.player == 1);
 			lastSOS = sos; //save it to draw line in GUI
 		}
 		else {
 			if (isBoardFull()) {
-				isTie = true;
-				gameOver = true;
+				isTie = true; //game is a tie if board is full with no SOS
+				gameOver = true; //set game to over
 			}
 		}
 		

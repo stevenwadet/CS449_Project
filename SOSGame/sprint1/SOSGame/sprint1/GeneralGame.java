@@ -53,6 +53,8 @@ public class GeneralGame extends Game {
 
         if (result.moveMade) {
             boolean currentPlayer = isPlayer1Turn();
+            
+            lastMoveSOS.clear(); //clear last move SOSs before computing new ones
             updateScore(row, col, currentPlayer); // compute SOSs and update score
 
             boolean extra = extraTurn(); // now correctly reflects SOSs created by this move
@@ -66,9 +68,7 @@ public class GeneralGame extends Game {
         return result;
 	}
 	
-	public void updateScore(int row, int col, boolean currentPlayer) {
-	    lastMoveSOS.clear(); // clear previous move SOSs
-	    
+	public void updateScore(int row, int col, boolean currentPlayer) {   
 	    char letter = board[row][col]; //get letter just placed on board
 	    int placedPlayer = currentPlayer ? 1 : 2; //which player placed letter
 
