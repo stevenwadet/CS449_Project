@@ -7,11 +7,23 @@ public class SimpleGame extends Game {
 	private boolean gameOver = false;
 	private boolean winnerIsPlayer1;//true if player1 won, false if player 2 won
 	private SOSInfo lastSOS; //store last SOS for GUI drawing
+	private boolean isTie = false;
 	
 	public SOSInfo getLastSOS() {return lastSOS;}
 
 	public SimpleGame(int size) {
 		super(size);
+	}
+	
+	public boolean isBoardFull() {
+		for (int r = 0; r < size; r++) {
+			for (int c = 0; c < size; c++) {
+				if (board[r][c] == '\0') {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	
 	@Override
@@ -24,6 +36,12 @@ public class SimpleGame extends Game {
 			winnerIsPlayer1 = (sos.player == 1);
 			lastSOS = sos; //save it to draw line in GUI
 		}
+		else {
+			if (isBoardFull()) {
+				isTie = true;
+				gameOver = true;
+			}
+		}
 		
 		return gameOver;
 		
@@ -31,12 +49,31 @@ public class SimpleGame extends Game {
 	
 	@Override
 	public String getWinner() {
+		
+		if (isTie) {
+			return "It's a Tie!";
+		}
 		if (!gameOver) {
 			return null;
 		}
         return winnerIsPlayer1 ? "Blue Player Wins!" : "Red Player Wins!";
 	}
 	
+	
+	
+	@Override
+	public MoveResult makeMove(int row, int col, char letter) {
+	    MoveResult result = super.makeMove(row, col, letter); // call Game.makeMove
+
+	    if (result.moveMade) {
+	        SOSInfo sos = findSOS(); // detect SOS immediately after move
+	        if (sos != null) { 
+	            lastSOS = sos; // store for GUI line drawing
+	        }
+	    }
+
+	    return result;
+	}
 	
 	//returns 0 if no SOS found, 1 if player1 made SOS, 2 if player2 made SOS
 	private SOSInfo findSOS() {
@@ -49,28 +86,24 @@ public class SimpleGame extends Game {
 					}
 					
 					// horizontal
-	                if (c + 2 < size && board[r][c+1] == 'O' && board[r][c+2] == 'S' &&
-	                    ownerBoard[r][c+1] == player && ownerBoard[r][c+2] == player) {
+	                if (c + 2 < size && board[r][c+1] == 'O' && board[r][c+2] == 'S') {
 	                    return makeSOS(r, c, r, c+1, r, c+2, 0, player);
 	                }
 
 	                // vertical
-	                if (r + 2 < size && board[r+1][c] == 'O' && board[r+2][c] == 'S' &&
-	                    ownerBoard[r+1][c] == player && ownerBoard[r+2][c] == player) {
+	                if (r + 2 < size && board[r+1][c] == 'O' && board[r+2][c] == 'S') {
 	                    return makeSOS(r, c, r+1, c, r+2, c, 1, player);
 	                }
 
 	                // diagonal down-right
 	                if (r + 2 < size && c + 2 < size &&
-	                    board[r+1][c+1] == 'O' && board[r+2][c+2] == 'S' &&
-	                    ownerBoard[r+1][c+1] == player && ownerBoard[r+2][c+2] == player) {
+	                    board[r+1][c+1] == 'O' && board[r+2][c+2] == 'S') {
 	                    return makeSOS(r, c, r+1, c+1, r+2, c+2, 2, player);
 	                }
 
 	                // diagonal down-left
 	                if (r + 2 < size && c - 2 >= 0 &&
-	                    board[r+1][c-1] == 'O' && board[r+2][c-2] == 'S' &&
-	                    ownerBoard[r+1][c-1] == player && ownerBoard[r+2][c-2] == player) {
+	                    board[r+1][c-1] == 'O' && board[r+2][c-2] == 'S') {
 	                    return makeSOS(r, c, r+1, c-1, r+2, c-2, 3, player);
 	                }
 				}

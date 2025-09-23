@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.Dimension;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
@@ -11,11 +12,11 @@ import javax.swing.border.EmptyBorder;
 import java.util.Random;
 
 
-
-
 public class SOSGame implements ActionListener{
 	
 	private Game game; //reference to game logic
+	private boolean isGameOver = false; //flag for game over
+	int currentBoardSize = 3; //default board size
 	
 	Random random = new Random();
 	JFrame frame = new JFrame(); //creating new JFrame
@@ -27,7 +28,9 @@ public class SOSGame implements ActionListener{
 	JPanel boardSizePanel = new JPanel(); //creating panel for board size text and text field
 	
 	JLabel textfield = new JLabel(); //creating text
-	JButton[] buttons; //establishing 9 buttons for board (NEEDS CHANGE)
+	JLabel blueScoreLabel = new JLabel("Blue: 0"); //blue score label
+	JLabel redScoreLabel = new JLabel("Red: 0"); //red score label
+	JButton[] buttons; //establishing buttons for board
 	JButton newGameButton = new JButton("New Game"); //creating the new game button
 	JLabel boardSizeText = new JLabel("Board Size (3-10):");
 	JTextField boardSize = new JTextField(5); //creating variable board size text field
@@ -41,8 +44,9 @@ public class SOSGame implements ActionListener{
 	
 	ButtonGroup gameGroup = new ButtonGroup(); //creating new button group for game choice buttons
 	ButtonGroup choiceGroup = new ButtonGroup(); //creating a new button group for S or O choice buttons
-	int currentBoardSize = 3; //default board size
 	
+	LineOverlay lineOverlay1 = new LineOverlay();
+	JLayeredPane centerPane = new JLayeredPane(); //center layered pane
 	
 	SOSGame(Game game){
 		this.game = game;
@@ -53,6 +57,7 @@ public class SOSGame implements ActionListener{
 		frame.getContentPane().setBackground(new Color(50,50,50)); //set background color
 		frame.setLayout(new BorderLayout());
 		
+		//title panel
 		textfield.setBackground(new Color(25,25,25)); //setting background color for text = black
 		textfield.setForeground(new Color(25,255,0)); //setting color of text = green
 		textfield.setFont(new Font("Ink Free", Font.BOLD,75)); //setting font for text
@@ -61,7 +66,6 @@ public class SOSGame implements ActionListener{
 		textfield.setOpaque(true);
 		
 		title_panel.setLayout(new BorderLayout()); //establishing our title panel
-		title_panel.setBounds(0,0,800,100); //establishing the bounds for our title panel
 		title_panel.add(textfield); //adding text to title panel
 		frame.add(title_panel,BorderLayout.NORTH); //setting position of title panel
 		
@@ -83,15 +87,18 @@ public class SOSGame implements ActionListener{
 		simpleButton.setSelected(true);
 		gameGroup.add(generalButton);
 		
-		//adding buttons and check box to our bottom panel
+		//adding buttons, check box, and score board to our bottom panel
 		bottomPanel.add(simpleButton);
 		bottomPanel.add(generalButton);
 		bottomPanel.add(recordGame);
+		bottomPanel.add(blueScoreLabel);
+		bottomPanel.add(redScoreLabel);
+		blueScoreLabel.setForeground(Color.BLUE);
+		redScoreLabel.setForeground(Color.RED);
 		frame.add(bottomPanel, BorderLayout.SOUTH); //setting position of bottom panel
 		
 		//adding new game and board size changer on right panel
 		boardSizePanel.setLayout(new BoxLayout(boardSizePanel, BoxLayout.Y_AXIS));
-		
 		boardSizeText.setAlignmentX(Component.CENTER_ALIGNMENT); //center text
 		boardSizeText.setBorder(new EmptyBorder(0, 10, 0, 10)); //add padding around text for nicer looks
 		
@@ -113,7 +120,16 @@ public class SOSGame implements ActionListener{
 		rightPanel.add(boardSizePanel); //add panel containing board size label and text field
 		frame.add(rightPanel, BorderLayout.EAST);//setting position of right panel
 		
-		
+		centerPane.setLayout(new OverlayLayout(centerPane)); // allows absolute positioning
+        button_panel.setOpaque(false);
+        lineOverlay1.setOpaque(false);
+        
+        centerPane.add(lineOverlay1);   // top layer (lines)
+        centerPane.add(button_panel);   // bottom layer (buttons)
+        frame.add(centerPane, BorderLayout.CENTER);
+        
+        
+        // new game button logic
 		newGameButton.addActionListener(e -> {
 			int size;
 			try {
@@ -123,9 +139,9 @@ public class SOSGame implements ActionListener{
 	            size = 3;
 	        }
 			
-			
 			boardSize.setText(String.valueOf(size));//updates board size field
 			currentBoardSize = size; //setting board size
+			isGameOver = false; //reset game over flag
 			
 			//create either SimpleGame or GeneralGame
 			if (simpleButton.isSelected()) {
@@ -135,13 +151,13 @@ public class SOSGame implements ActionListener{
 				this.game = new GeneralGame(size);
 			}
 			
-			
-			
+			// Reset scores
+			blueScoreLabel.setText("Blue: 0"); 
+			redScoreLabel.setText("Red: 0");
 			
 	        createBoard(currentBoardSize);//create new game board
 	        firstTurn(); //call first turn
 		});
-		
 		
 		createBoard(currentBoardSize);//create initial game board
 		firstTurn(); //call first turn after fully setting up
@@ -149,61 +165,63 @@ public class SOSGame implements ActionListener{
 	}
 	
 	class SOSButton extends JButton {
-		private boolean drawLine = false;
-		private int lineType = -1; // 0=horizontal, 1=vertical, 2=diagRight, 3=diagLeft
-		private Color lineColor = Color.black;
-		
 		SOSButton () {
 			super();
 			setOpaque(true);
 			setBorder(BorderFactory.createLineBorder(Color.GRAY));
 			setFont(new Font("MV Boli", Font.BOLD, 40));
 		}
-		
-		public void markSOS(int type, Color color) {
-			this.drawLine = true;
-			this.lineType = type;
-			this.lineColor = color;
-			repaint(); //force redraw
-		}
-		
-		@Override
-		protected void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			
-			if (drawLine) { //only draw line if drawLine flag is true
-				Graphics2D g2 = (Graphics2D) g;
-				g2.setStroke(new BasicStroke(4)); //set thickness of line to 4 pixels
-				g2.setColor(lineColor); //set color of line
-				
-				int w = getWidth(); //get width of button
-				int h = getHeight(); //get height of button
-				
-				// draw a line based on SOS
-				switch (lineType) {
-					//horizontal
-					case 0: 
-						g2.drawLine(5, h/2, w-5, h/2); 
-						break; 
-						
-					// vertical
-	                case 1: 
-	                	g2.drawLine(w/2, 5, w/2, h-5); 
-	                	break; 
-	                
-	                // diagonal down-right
-	                case 2: 
-	                	g2.drawLine(5, 5, w-5, h-5); 
-	                	break;
-	                	
-	                // diagonal down-left	
-	                case 3: 
-	                	g2.drawLine(w-5, 5, 5, h-5); 
-	                	break; 
-				}
-			}
-		}
 	}
+	
+	//structure to store SOS line info
+	class SOSLine {
+	    int startRow, startCol, endRow, endCol;
+	    Color color;
+
+	    SOSLine(int r1, int c1, int r3, int c3, Color color) {
+	        this.startRow = r1;
+	        this.startCol = c1;
+	        this.endRow = r3;
+	        this.endCol = c3;
+	        this.color = color;
+	    }
+	}
+	
+	//overlay panel to draw lines over buttons
+	class LineOverlay extends JPanel {
+	    private static final long serialVersionUID = 1L;
+	    List<SOSLine> lines = new ArrayList<>();
+
+	    public void addLine(SOSLine line) {
+	        lines.add(line);
+	        repaint();
+	    }
+
+	    public void clearLines() {
+	        lines.clear();
+	        repaint();
+	    }
+
+	    @Override
+	    protected void paintComponent(Graphics g) {
+	        super.paintComponent(g);
+	        Graphics2D g2 = (Graphics2D) g;
+	        g2.setStroke(new BasicStroke(4));
+
+	        for (SOSLine line : lines) {
+	            g2.setColor(line.color);
+
+	            // Calculate centers of start and end buttons
+	            int startX = line.startCol * getWidth() / currentBoardSize + getWidth() / (2 * currentBoardSize);
+	            int startY = line.startRow * getHeight() / currentBoardSize + getHeight() / (2 * currentBoardSize);
+	            int endX = line.endCol * getWidth() / currentBoardSize + getWidth() / (2 * currentBoardSize);
+	            int endY = line.endRow * getHeight() / currentBoardSize + getHeight() / (2 * currentBoardSize);
+
+	            g2.drawLine(startX, startY, endX, endY);
+	        }
+	    }
+	}
+
 	private void createBoard(int size) {
 		button_panel.removeAll();//removing all old buttons
 		button_panel.setLayout(new GridLayout(size, size, 2, 2));//establishing new grid 
@@ -217,26 +235,30 @@ public class SOSGame implements ActionListener{
             button_panel.add(buttons[i]);//add new button to button panel
 		}
 		
-		
-		//making sure button is in the frame
-		if (button_panel.getParent() == null) {
-			frame.add(button_panel, BorderLayout.CENTER);
-		}
-		
-		button_panel.revalidate();//forces panel to re-run layout manager, since it doesn't do it automatically
-		button_panel.repaint();//redraw the panel
+		button_panel.revalidate();
+	    button_panel.repaint();
+
+	    // make sure overlay covers new buttons
+	    lineOverlay1.setBounds(button_panel.getBounds());
+	    lineOverlay1.clearLines();
+	    lineOverlay1.revalidate();
+	    lineOverlay1.repaint();
 	}
 
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {	
+		//checking for game over
+		if (isGameOver) {
+			return;
+		}
+		
 	    for (int i = 0; i < buttons.length; i++) { //loop through each button
 	        if (e.getSource() == buttons[i] && buttons[i].getText().equals("")) { 
 
 	            String letter = sButton.isSelected() ? "S" : "O"; 
 	            int row = i / currentBoardSize;
 	            int col = i % currentBoardSize;
-	            
 	            
 	            //who's turn is it?
 	            boolean currentPlayer = game.isPlayer1Turn();
@@ -249,35 +271,44 @@ public class SOSGame implements ActionListener{
 	                buttons[i].setText(letter);
 	                buttons[i].setForeground(currentPlayer ? Color.BLUE : Color.RED);
 
-	                // Update score if GeneralGame
+	                // Update score and draw SOS lines if GeneralGame
 	                if (game instanceof GeneralGame) {
-	                    ((GeneralGame) game).updateScore(row, col);
+	                    GeneralGame gg = (GeneralGame) game;
+	                    
+	                    List<GeneralGame.SOSInfo> sosList = gg.getLastSOSList();
+	                    if (sosList != null) {
+	                    	for (GeneralGame.SOSInfo sos : sosList) {
+	                    		Color lineColor = (sos.player == 1) ? Color.BLUE : Color.RED;
+	                    		lineOverlay1.addLine(new SOSLine(sos.r1, sos.c1, sos.r3, sos.c3, lineColor));
+	                    	}
+	                    }
+	                    
+	                    // Update score labels
+	                    blueScoreLabel.setText("Blue: " + gg.getBlueScore());
+	                    redScoreLabel.setText("Red: " + gg.getRedScore());
 	                }
+	                
+	             // If this is SimpleGame, draw the SOS line
+                    if (game instanceof SimpleGame) {
+                        SimpleGame sg = (SimpleGame) game;
+                        SimpleGame.SOSInfo sos = sg.getLastSOS();
+                        if (sos != null) { //if we have an SOS
+                        	Color lineColor = (sos.player == 1) ? Color.BLUE : Color.RED;
+                            lineOverlay1.addLine(new SOSLine(sos.r1, sos.c1, sos.r3, sos.c3, lineColor));
+                            
+                            // update score labels
+                            int blue = (sos.player == 1) ? 1 : 0;
+                            int red = (sos.player == 2) ? 1 : 0;
+                            blueScoreLabel.setText("Blue: " + blue);
+                            redScoreLabel.setText("Red: " + red);
+                        }
+                    }
+                    
 
 	                // Update turn text or show winner
 	                if (result.gameOver) { //if game over
+	                	isGameOver = true;
 	                    textfield.setText(result.winner); //set text to congratulate winner
-	                    for (JButton btn : buttons) btn.setEnabled(false);
-	                    
-	                 // If this is SimpleGame, draw the SOS line
-	                    if (game instanceof SimpleGame) {
-	                        SimpleGame.SOSInfo sos = ((SimpleGame) game).getLastSOS();
-	                        if (sos != null) { //if we have an SOS
-	                            Color lineColor = (sos.player == 1) ? Color.BLUE : Color.RED; //set line color = color of player
-	                            
-	                            // r[0] c[0] == first S
-	                            // r[1] c[1] == middle O
-	                            // r[2] c[2] == final S
-	                            int[] r = {sos.r1, sos.r2, sos.r3};
-	                            int[] c = {sos.c1, sos.c2, sos.c3};
-	                            for (int j = 0; j < 3; j++) {
-	                            	//get button in GUI corresponding to this cell of SOS
-	                                SOSButton btn = (SOSButton) buttons[r[j] * currentBoardSize + c[j]];
-	                                btn.markSOS(sos.direction, lineColor);
-	                            }
-	                        }
-	                    }
-	                    
 	                } else { //if game not over, set turn text
 	                    textfield.setText(result.nextPlayerIs1 ? "Blue Player's Turn" : "Red Player's Turn"); 
 	                }
@@ -285,9 +316,7 @@ public class SOSGame implements ActionListener{
 	        }
 	    }
 	}
-
 	
-
 	public void firstTurn() {
 
 		// Show "SOS Game" for 0.5s, then switch to player's turn

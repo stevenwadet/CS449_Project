@@ -69,9 +69,11 @@ public abstract class Game {
 	    result.moveMade = placeLetter(row, col, letter); //attempt to place letter on board
 
 	    if (result.moveMade) { //if move successfully made
-	        if (!checkGameOver()) { //if game not over
-	            switchTurn();
-	        } 
+	    	
+	        boolean extra = extraTurn();//check to see if user has an extra turn
+	        if (!extra) {
+	        	switchTurn();
+	        }
 	        result.gameOver = checkGameOver(); //update MoveResult to indicate if the game is over
 	        result.winner = result.gameOver ? getWinner() : null; // if game over, get winner; otherwise, leave null
 	        result.nextPlayerIs1 = isPlayer1Turn(); //store whose turn it is (true = p1, false = p2)
