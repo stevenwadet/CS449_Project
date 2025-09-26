@@ -45,3 +45,14 @@ Project hosting site: github.com
 
 https://github.com/stevenwadet/CS449_Project/blob/0e5159d14fbb5da59b1a1589e42387f4ccb056b1/SOSGame/src/SOSGame.java#L1-L151
 
+
+
+
+## Sprint #1 Report
+
+Implemented the following: choosing the board size, choosing the game mode (simple or general), starting a new game, making a move (in simple or general game), determining if a simple or general game is over.
+
+### Screenshots of user stories and accompanying acceptance criteria:
+
+
+### Source code:
