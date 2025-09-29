@@ -54,5 +54,7 @@ Implemented the following: choosing the board size, choosing the game mode (simp
 
 ### Screenshots of user stories and accompanying acceptance criteria:
 
-
-### Source code:
+<img width="518" height="99" alt="Screenshot 2025-09-29 at 11 16 19 AM" src="https://github.com/user-attachments/assets/a4c70fc9-4749-4845-aebe-f4c7620c897e" />
+<img width="513" height="160" alt="Screenshot 2025-09-29 at 11 17 11 AM" src="https://github.com/user-attachments/assets/161a88ea-8bc5-45bf-acd7-f2b748573efb" />
+<img width="516" height="514" alt="Screenshot 2025-09-29 at 11 17 30 AM" src="https://github.com/user-attachments/assets/4bf5bff9-88ba-477c-ab67-4809b6630200" />
+<img width="513" height="366" alt="Screenshot 2025-09-29 at 11 17 41 AM" src="https://github.com/user-attachments/assets/8013328c-226b-4ccb-93f3-c2aef111a1d4" />
