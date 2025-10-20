@@ -1,4 +1,4 @@
-package SOSGame.sprint1;
+package SOSGame.sprint2.production_code;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
+import SOSGame.sprint2.production_code.SOSGame;
 
 import java.util.Random;
 
@@ -22,65 +23,66 @@ public class SOSGame implements ActionListener {
   int currentBoardSize = 3; // default board size
 
   Random random = new Random();
-  JFrame frame = new JFrame(); 
-  JPanel titlePanel = new JPanel(); 
+  
+  JFrame frame = new JFrame();
+  JPanel titlePanel = new JPanel();
   JPanel buttonPanel = new JPanel(); 
   JPanel bottomPanel = new JPanel(); 
   JPanel leftPanel = new JPanel(); 
   JPanel rightPanel = new JPanel(); 
   JPanel boardSizePanel = new JPanel(); 
 
-  JLabel textfield = new JLabel();
+  public JLabel textfield = new JLabel();
   JLabel blueScoreLabel = new JLabel("Blue: 0"); 
   JLabel redScoreLabel = new JLabel("Red: 0"); 
-  JButton[] buttons; // buttons vector for board
-  JButton newGameButton = new JButton("New Game");
+  public JButton[] buttons; // buttons vector for board
+  public JButton newGameButton = new JButton("New Game");
   JLabel boardSizeText = new JLabel("Board Size (3-10):");
-  JTextField boardSize = new JTextField(5); // creating variable board size text field
+  public JTextField boardSize = new JTextField(5); // creating variable board size text field
   
-  JRadioButton simpleButton = new JRadioButton("Simple Game");
-  JRadioButton generalButton = new JRadioButton("General Game");
-  JRadioButton sletterButton = new JRadioButton("S");
-  JRadioButton oletterButton = new JRadioButton("O");
+  public JRadioButton simpleButton = new JRadioButton("Simple Game");
+  public JRadioButton generalButton = new JRadioButton("General Game");
+  public JRadioButton sLetterButton = new JRadioButton("S");
+  public JRadioButton oLetterButton = new JRadioButton("O");
   JCheckBox recordGame = new JCheckBox("Record Game");
 
   ButtonGroup gameGroup = new ButtonGroup(); // button group for game choice buttons
   ButtonGroup choiceGroup = new ButtonGroup(); // button group for S or O choice buttons
-
+  
   LineOverlay lineOverlay1 = new LineOverlay();
   JLayeredPane centerPane = new JLayeredPane(); // center layered pane
-
-  SOSGame(Game game) {
-    this.game = game;
+  
+  private void initializeFrame() {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(800, 800);
     frame.setMinimumSize(new Dimension(1100, 800)); // ensures title flash fits
     frame.getContentPane().setBackground(new Color(50, 50, 50)); // set background color
     frame.setLayout(new BorderLayout());
-    // title panel
+  }
+  
+  private void setupTitlePanel() {
     textfield.setBackground(new Color(25, 25, 25)); // black
     textfield.setForeground(new Color(25, 255, 0)); // green
     textfield.setFont(new Font("Ink Free", Font.BOLD, 75));
     textfield.setHorizontalAlignment(JLabel.CENTER); 
     textfield.setText("SOS Game");
     textfield.setOpaque(true);
-    
     titlePanel.setLayout(new BorderLayout()); // establishing our title panel
     titlePanel.add(textfield); // adding text to title panel
     frame.add(titlePanel, BorderLayout.NORTH); // setting position of title panel
-    
-    // adding our s and o buttons to our choice button group, setting S as default choice
-    choiceGroup.add(sletterButton);
-    choiceGroup.add(oletterButton);
-    sletterButton.setSelected(true);
-    
-    // adding our left panel with our simple or general game buttons
+  }
+  
+  private void setupLeftPanel() {
+    choiceGroup.add(sLetterButton);
+    choiceGroup.add(oLetterButton);
+    sLetterButton.setSelected(true);
     leftPanel.setLayout(new GridLayout(2, 1, 10, 10));
-    leftPanel.add(sletterButton);
-    leftPanel.add(oletterButton);
+    leftPanel.add(sLetterButton);
+    leftPanel.add(oLetterButton);
     frame.add(leftPanel, BorderLayout.WEST); // setting position of left panel
-    
-    // adding radio buttons to our game button group
+  }
+  
+  private void setupBottomPanel() {
     gameGroup.add(simpleButton);
     simpleButton.setSelected(true);
     gameGroup.add(generalButton);
@@ -94,7 +96,9 @@ public class SOSGame implements ActionListener {
     blueScoreLabel.setForeground(Color.BLUE);
     redScoreLabel.setForeground(Color.RED);
     frame.add(bottomPanel, BorderLayout.SOUTH); // setting position of bottom panel
-    
+  }
+  
+  private void setupRightPanel() {
     // adding new game and board size changer on right panel
     boardSizeText.setAlignmentX(Component.CENTER_ALIGNMENT); // center text
     boardSizeText.setBorder(new EmptyBorder(0, 10, 0, 10)); // padding around text
@@ -117,20 +121,41 @@ public class SOSGame implements ActionListener {
     rightPanel.add(Box.createRigidArea(new Dimension(0, 10))); // add vertical gap
     rightPanel.add(boardSizePanel); // add panel containing board size label and text field
     frame.add(rightPanel, BorderLayout.EAST); 
-    
+  }
+  
+  private void setupCenterPane() {
     buttonPanel.setOpaque(false);
     lineOverlay1.setOpaque(false);
     
     centerPane.setLayout(new OverlayLayout(centerPane)); // allows absolute positioning
     centerPane.add(lineOverlay1); // top layer (lines)
     centerPane.add(buttonPanel); // bottom layer (buttons)
-    frame.add(centerPane, BorderLayout.CENTER);
+    frame.add(centerPane, BorderLayout.CENTER); 
+  }
+  
+  private void initializeUi() {
+    initializeFrame();
+    setupTitlePanel();
+    setupLeftPanel();
+    setupBottomPanel();
+    setupRightPanel();
+    setupCenterPane();
+    frame.setVisible(true);
+  }
+  
+  
+  public SOSGame(Game game) {
+    this.game = game;
+    
+    
+    
+    initializeUi();
     
     // new game button logic
     newGameButton.addActionListener(e -> {
       int size;
       try {
-        size = Integer.parseInt(boardSize.getText()); // acquiring size from text field
+        size = Integer.parseInt(boardSize.getText());; // acquiring size from text field
         if (size < 3 || size > 10) {
           size = 3; // ensuring board is at least 3x3 and no larger than 10x10
         }
@@ -252,6 +277,80 @@ public class SOSGame implements ActionListener {
     });
 
   }
+  
+  private int getButtonIndex(ActionEvent e) {
+    for (int i = 0; i < buttons.length; i++) {
+      if (e.getSource() == buttons[i]) {
+        return i;
+      }
+    }
+    return -1;
+  }
+  
+  private String getSelectedLetter() {
+    return sLetterButton.isSelected() ? "S" : "O";
+  }
+  
+  private void updateButton(int index, String letter, boolean currentPlayer) {
+    buttons[index].setText(letter);
+    buttons[index].setForeground(currentPlayer ? Color.BLUE : Color.RED);
+  }
+  
+  private void drawSOSLines() {
+    lineOverlay1.clearLines();
+    if (game instanceof GeneralGame) {
+      GeneralGame gg = (GeneralGame) game;
+      List<GeneralGame.SOSInfo> sosList = gg.getLastSOSList();
+      if (sosList != null) {
+        for (GeneralGame.SOSInfo sos : sosList) {
+          Color lineColor = (sos.player == 1) ? Color.BLUE : Color.RED;
+          lineOverlay1.addLine(new SOSLine(sos.r1, sos.c1, sos.r3, sos.c3, lineColor));
+        }
+      }
+    } else if (game instanceof SimpleGame) {
+      SimpleGame sg = (SimpleGame) game;
+      SimpleGame.SOSInfo sos = sg.getLastSOS();
+      if (sos != null) {
+        Color lineColor = (sos.player == 1) ? Color.BLUE : Color.RED;
+        int lastR = sg.getLastMoveRow();
+        int lastC = sg.getLastMoveCol();
+
+        // Draw line from first SOS cell → last move → last SOS cell
+        lineOverlay1.addLine(new SOSLine(sos.r1, sos.c1, lastR, lastC, lineColor));
+        lineOverlay1.addLine(new SOSLine(lastR, lastC, sos.r3, sos.c3, lineColor));
+      }
+    } 
+  }
+  
+  private void updateScores() {
+    if (game instanceof GeneralGame) {
+      GeneralGame gg = (GeneralGame) game;
+      blueScoreLabel.setText("Blue: " + gg.getBlueScore());
+      redScoreLabel.setText("Red: " + gg.getRedScore());
+    } else if (game instanceof SimpleGame) {
+      SimpleGame sg = (SimpleGame) game;
+      SimpleGame.SOSInfo sos = sg.getLastSOS();
+      
+      int blue = 0;
+      int red = 0;
+      if (sos != null) {
+        blue = (sos.player == 1) ? 1 : 0;
+        red = (sos.player == 2) ? 1 : 0;
+      }
+      
+      blueScoreLabel.setText("Blue: " + blue);
+      redScoreLabel.setText("Red: " + red);
+    }
+  }
+  
+  private void updateTurnOrWinner(Game.MoveResult result) {
+    if (result.gameOver) {
+      isGameOver = true;
+      textfield.setText(result.winner);
+    } else {
+      textfield.setText(result.nextPlayerIs1 ? "Blue Player's Turn" : "Red Player's Turn");
+    }
+  }
 
   @Override
   public void actionPerformed(ActionEvent e) {
@@ -260,66 +359,27 @@ public class SOSGame implements ActionListener {
       return;
     }
 
-    for (int i = 0; i < buttons.length; i++) { // loop through each button
-      if (e.getSource() == buttons[i] && buttons[i].getText().equals("")) {
-        String letter = sletterButton.isSelected() ? "S" : "O";
-        int row = i / currentBoardSize;
-        int col = i % currentBoardSize;
-        
-        // who's turn is it?
-        boolean currentPlayer = game.isPlayer1Turn();
-
-        // Make the move using Game.makeMove (handles placement and turn)
-        Game.MoveResult result = game.makeMove(row, col, letter.charAt(0));
-        
-        if (result.moveMade) {
-          // Update GUI to appropriate letter and color
-          buttons[i].setText(letter);
-          buttons[i].setForeground(currentPlayer ? Color.BLUE : Color.RED);
-
-          // Update score and draw SOS lines if GeneralGame
-          if (game instanceof GeneralGame) {
-            GeneralGame gg = (GeneralGame) game;
-            List<GeneralGame.SOSInfo> sosList = gg.getLastSOSList();
-            if (sosList != null) {
-              for (GeneralGame.SOSInfo sos : sosList) {
-                Color lineColor = (sos.player == 1) ? Color.BLUE : Color.RED;
-                lineOverlay1.addLine(new SOSLine(sos.r1, sos.c1, sos.r3, sos.c3, lineColor));
-              }
-            }
-
-            // Update score labels
-            blueScoreLabel.setText("Blue: " + gg.getBlueScore());
-            redScoreLabel.setText("Red: " + gg.getRedScore());
-          }
-
-          // If this is SimpleGame, draw the SOS line
-          if (game instanceof SimpleGame) {
-            SimpleGame sg = (SimpleGame) game;
-            SimpleGame.SOSInfo sos = sg.getLastSOS();
-            if (sos != null) { // if we have an SOS
-              Color lineColor = (sos.player == 1) ? Color.BLUE : Color.RED;
-              lineOverlay1.addLine(new SOSLine(sos.r1, sos.c1, sos.r3, sos.c3, lineColor));
-              
-              // update score labels
-              int blue = (sos.player == 1) ? 1 : 0;
-              int red = (sos.player == 2) ? 1 : 0;
-              blueScoreLabel.setText("Blue: " + blue);
-              redScoreLabel.setText("Red: " + red);
-            }
-          }
-          
-          // Update turn text or show winner
-          if (result.gameOver) { // if game over
-            isGameOver = true;
-            textfield.setText(result.winner); // set text to congratulate winner
-          } else { // if game not over, set turn text
-            textfield.setText(result.nextPlayerIs1 ? "Blue Player's Turn" : "Red Player's Turn");
-          }
-          
-        }
-      }
+    int buttonIndex = getButtonIndex(e);
+    if (buttonIndex == -1 || !buttons[buttonIndex].getText().equals("")) {
+      return;
     }
+    
+    int row = buttonIndex / currentBoardSize;
+    int col = buttonIndex % currentBoardSize;
+    String letter = getSelectedLetter();
+    
+    
+    boolean currentPlayer = game.isPlayer1Turn();
+    Game.MoveResult result = game.makeMove(row, col, letter.charAt(0));
+    
+    if (!result.moveMade) {
+      return;
+    }
+    
+    updateButton(buttonIndex, letter, currentPlayer);
+    drawSOSLines();
+    updateScores();
+    updateTurnOrWinner(result);
   }
 
   /**
@@ -336,13 +396,28 @@ public class SOSGame implements ActionListener {
     t.start();
   }
   
+  
+  public Game getCurrentGame() {
+    return game;
+  }
+  
+  public String getSelectedGameMode() {
+    if (simpleButton.isSelected()) {
+      return "Simple";
+    } else if (generalButton.isSelected()) {
+      return "General";
+    } else {
+      return "None";
+    }
+  }
+  
   /**
    * initializes and starts new SOS game.
    *
    * @param args not used.
    */
   public static void main(String[] args) {
-    new SOSGame(new SimpleGame(3)); 
+    SOSGame sosGame = new SOSGame(new SimpleGame(3)); // default game option
   }
 
 }

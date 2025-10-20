@@ -1,5 +1,4 @@
-package SOSGame.sprint1;
-
+package SOSGame.sprint2.production_code;
 
 /**
  * simple game class.
@@ -10,10 +9,21 @@ public class SimpleGame extends Game {
   private boolean winnerIsPlayer1; // true if player1 won, false if player 2 won
   private SOSInfo lastSOS; // store last SOS for GUI drawing
   private boolean isTie = false;
+  private int lastPlayer = 1; // 1=blue, 2=red
+  private int lastMoveRow = -1;
+  private int lastMoveCol = -1;
 
   public SOSInfo getLastSOS() {
     return lastSOS;
   }
+  
+  public int getLastMoveRow() {
+    return lastMoveRow;
+  }
+  
+  public int getLastMoveCol() {
+	    return lastMoveCol;
+	  }
 
   /**
    * create a simple game with specified board size.
@@ -22,6 +32,10 @@ public class SimpleGame extends Game {
    */
   public SimpleGame(int size) {
     super(size);
+    
+    if (size < 3 || size > 10) { 
+      throw new IllegalArgumentException("Board size must be between 3 and 50.");
+    }
   }
   
 
@@ -47,7 +61,7 @@ public class SimpleGame extends Game {
       return true;
     }
     
-    SOSInfo sos = findSOS(); 
+    SOSInfo sos = findSOS(lastMoveRow, lastMoveCol, lastPlayer); 
     if (sos != null) { // if we have an SOS
       gameOver = true;
       winnerIsPlayer1 = (sos.player == 1);
@@ -77,9 +91,13 @@ public class SimpleGame extends Game {
 
   @Override
   public MoveResult makeMove(int row, int col, char letter) {
+    lastMoveRow = row;
+    lastMoveCol = col;
+    lastPlayer = isPlayer1Turn() ? 1 : 2;
+    
     MoveResult result = super.makeMove(row, col, letter); // call Game.makeMove
     if (result.moveMade) {
-      SOSInfo sos = findSOS(); // detect SOS immediately after move
+      SOSInfo sos = findSOS(lastMoveRow, lastMoveCol, lastPlayer);
       if (sos != null) { 
         lastSOS = sos; // store for GUI line drawing
       }
@@ -89,35 +107,35 @@ public class SimpleGame extends Game {
   }
 
   // returns 0 if no SOS found, 1 if player1 made SOS, 2 if player2 made SOS
-  private SOSInfo findSOS() {
+  private SOSInfo findSOS(int lastRow, int lastCol, int currentPlayer) {
     for (int r = 0; r < size; r++) {
       for (int c = 0; c < size; c++) {
         if (board[r][c] == 'S') {
-          int player = ownerBoard[r][c]; // who placed this S?
-          if (player == 0) { // if cell empty, skip SOS check
-            continue;
-          }
-        
           // horizontal
           if (c + 2 < size && board[r][c + 1] == 'O' && board[r][c + 2] == 'S') {
-            return makeSOS(r, c, r, c + 1, r, c + 2, 0, player);
+            if (lastRow == r && (lastCol == c || lastCol == c + 1 || lastCol == c + 2)) {
+              return makeSOS(r, c, r, c + 1, r, c + 2, 0, currentPlayer);
+            }
           }
-
           // vertical
           if (r + 2 < size && board[r + 1][c] == 'O' && board[r + 2][c] == 'S') {
-            return makeSOS(r, c, r + 1, c, r + 2, c, 1, player);
+            if (lastCol == c && (lastRow == r || lastRow == r + 1 || lastRow == r + 2)) {
+              return makeSOS(r, c, r + 1, c, r + 2, c, 1, currentPlayer);	
+            } 
           }
-
           // diagonal down-right
           if (r + 2 < size && c + 2 < size 
               && board[r + 1][c + 1] == 'O' && board[r + 2][c + 2] == 'S') {
-            return makeSOS(r, c, r + 1, c + 1, r + 2, c + 2, 2, player);
+            if ((lastRow == r && lastCol == c) || (lastRow == r + 1 && lastCol == c + 1) || (lastRow == r + 2 && lastCol == c + 2)) {
+              return makeSOS(r, c, r + 1, c + 1, r + 2, c + 2, 2, currentPlayer);  
+            }
           }
-          
           // diagonal down-left
           if (r + 2 < size && c - 2 >= 0 
               && board[r + 1][c - 1] == 'O' && board[r + 2][c - 2] == 'S') {
-            return makeSOS(r, c, r + 1, c - 1, r + 2, c - 2, 3, player);
+            if ((lastRow == r && lastCol == c) || (lastRow == r + 1 && lastCol == c - 1) || (lastRow == r + 2 && lastCol == c - 2)) {
+              return makeSOS(r, c, r + 1, c - 1, r + 2, c - 2, 3, currentPlayer);  
+            }
           }
         }
       }
