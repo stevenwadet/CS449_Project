@@ -25,7 +25,7 @@ public class PlaceLetterTests {
     assertEquals("S", gui.buttons[index].getText());
 	
     // Confirm turn has changed (unless SOS formed, which we assume did not happen here)
-    boolean newTurn = gui.getCurrentGame().isPlayer1Turn();
+    boolean newTurn = gui.getCurrentGame().isPlayer1Turn(); 
     assertNotEquals(initialTurn, newTurn); // If player 1 moved, now player 2's turn
   }
 
