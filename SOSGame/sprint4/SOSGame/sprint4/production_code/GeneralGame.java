@@ -1,0 +1,252 @@
+package SOSGame.sprint4.production_code;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import SOSGame.sprint4.production_code.Game;
+
+
+/**
+ * represents a general SOS game.
+ */
+public class GeneralGame extends Game {
+  private int blueScore = 0;
+  private int redScore = 0;
+  private List<SOSInfo> lastMoveSOS = new ArrayList<>();
+  
+  public int getBlueScore() { 
+    return blueScore; 
+  }
+  
+  public int getRedScore() { 
+    return redScore; 
+  }
+
+  /**
+   * establishing size of general game.
+   *
+   * @param size size of board.
+   */
+  public GeneralGame(int size) {
+    super(size);
+  }
+
+  @Override
+  public boolean checkGameOver() {
+    // game ends when board is full
+    for (int r = 0; r < size; r++) {
+      for (int c = 0; c < size; c++) {
+        if (board[r][c] == '\0') { // empty character
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean extraTurn() {
+    // if lastMoveSOS contains SOSs, player gets another turn
+    return !lastMoveSOS.isEmpty();
+  }
+
+  @Override
+  public String getWinner() {
+    if (blueScore > redScore) {
+      return "Blue Player Wins!";
+    }
+    if (redScore > blueScore) {
+      return "Red Player Wins!";
+    }
+    return "It's a Tie!";
+  }
+
+
+  @Override
+  public MoveResult makeMove(int row, int col, char letter) {
+    MoveResult result = new MoveResult();
+    result.moveMade = placeLetter(row, col, letter);
+
+    if (result.moveMade) {
+      boolean currentPlayer = isPlayer1Turn();
+            
+      lastMoveSOS.clear(); // clear last move SOSs before computing new ones
+      updateScore(row, col, currentPlayer); // compute SOSs and update score
+
+      boolean extra = extraTurn(); // now correctly reflects SOSs created by this move
+      if (!extra) {
+        switchTurn();
+      }
+
+      result.gameOver = checkGameOver();
+      result.winner = result.gameOver ? getWinner() : null;
+      result.nextPlayerIs1 = isPlayer1Turn();
+    }
+
+    return result;
+  }
+
+  /**
+   * checks for SOS and updates score.
+   *
+   * @param row row of cell.
+   * @param col column of cell.
+   * @param currentPlayer player that placed the letter.
+   */
+  public void updateScore(int row, int col, boolean currentPlayer) {   
+    char letter = board[row][col]; // get letter just placed on board
+    int placedPlayer = currentPlayer ? 1 : 2; // which player placed letter
+
+    // direction vectors
+    int[][] dirs = {
+      {1, 0}, {-1, 0}, // vertical
+      {0, 1}, {0, -1}, // horizontal
+      {1, 1}, {-1, -1}, // diag down-right / up-left
+      {1, -1}, {-1, 1}  // diag down-left / up-right
+    };
+
+    List<SOSInfo> sosFoundThisMove = new ArrayList<>(); // store SOSs found this move
+
+
+    for (int[] d : dirs) { // loop over each direction
+      int dr = d[0];
+      int dc = d[1];
+
+      if (letter == 'O') { // case 1: player placed 'O'
+        int r1 = row - dr; 
+        int c1 = col - dc;
+        int r2 = row + dr; 
+        int c2 = col + dc;
+        
+        if (inBounds(r1, c1) && inBounds(r2, c2)) { // ensure both positions are inside board
+          if (board[r1][c1] == 'S' && board[r2][c2] == 'S') { // SOS found
+            // normalize SOSInfo so r1/c1 = "start", r3/c3 = "end"
+            SOSInfo sos = createSOS(r1, c1, row, col, r2, c2, placedPlayer, dr, dc);
+            sosFoundThisMove.add(sos); // add to temp list
+          }
+        }
+      }
+
+      if (letter == 'S') { // case 2: player placed 'S'
+        int r1 = row + dr; 
+        int c1 = col + dc;
+        int r2 = row + 2 * dr; 
+        int c2 = col + 2 * dc;
+        
+        if (inBounds(r1, c1) && inBounds(r2, c2)) { // ensure both positions are inside board
+          if (board[r1][c1] == 'O' && board[r2][c2] == 'S') { // SOS found starting at this S
+            SOSInfo sos = createSOS(row, col, r1, c1, r2, c2, placedPlayer, dr, dc);
+            sosFoundThisMove.add(sos); // add to temp list
+          }
+        }
+      }
+      
+    }
+    
+    // deduplicate identical SOS triples (avoid double counting from opposite directions)
+    List<SOSInfo> uniqueSOS = new ArrayList<>(); // stores deduplicated SOS
+    java.util.Set<String> seen = new java.util.HashSet<>(); // set of SOS keys already counted
+    for (SOSInfo s : sosFoundThisMove) { // check each SOS candidate
+      int startRow = s.r1; 
+      int startCol = s.c1; 
+      int endRow = s.r3; 
+      int endCol = s.c3; 
+      String key;
+      
+      // normalizing order so our key is consistent (smallest coordinate pair first)
+      if (startRow < endRow || (startRow == endRow && startCol <= endCol)) {
+        key = startRow + "," + startCol + ":" + endRow + "," + endCol + ":" + s.direction;
+      } else {
+        key = endRow + "," + endCol + ":" + startRow + "," + startCol + ":" + s.direction;
+      }
+
+      if (!seen.contains(key)) { 
+        seen.add(key); 
+        uniqueSOS.add(s); // add deduplicated SOS
+      }
+    }
+    // update scores only once per found SOS
+    for (SOSInfo sos : uniqueSOS) {
+      if (currentPlayer) {
+        blueScore++; 
+      } else {
+        redScore++;
+      }
+    }
+
+    // store unique SOS list for GUI line drawing
+    lastMoveSOS.addAll(uniqueSOS);
+  }
+
+  private SOSInfo createSOS(int r1, int c1, int r2, int c2, int r3, int c3, int player, int dr, int dc) {
+    int direction = directionFromDelta(dr, dc);
+
+    // reorder for diagonals to make start always "top-left" or "top-right"
+    if (r1 > r3 || (r1 == r3 && c1 > c3)) { // diag down-right
+      int tmpR = r1; 
+      int tmpC = c1;
+      r1 = r3; 
+      c1 = c3;
+      r3 = tmpR; 
+      c3 = tmpC;
+    }
+   
+    return new SOSInfo(r1, c1, r2, c2, r3, c3, direction, player);
+  }
+
+
+  // map dr, dc to line direction for drawing
+  private int directionFromDelta(int dr, int dc) {
+    // horizontal
+    if (dr == 0 && dc != 0)  {
+      return 0; 
+    }
+    
+    // vertical
+    if (dr != 0 && dc == 0)  {
+      return 1; 
+    }
+    
+    // diagonal down-right
+    if (dr == dc) {
+      return 2; 
+    }
+        
+    // diagonal down-left
+    if (dr == -dc) {
+      return 3; 
+    }
+    return -1;
+  }
+
+  public List<SOSInfo> getLastSOSList() {
+    return lastMoveSOS;
+  }
+
+  public class SOSInfo {
+    public int r1;
+    public int c1;
+    public int r2;
+    public int c2;
+    public int r3;
+    public int c3; // the three cells forming SOS
+    public int direction; // 0=horizontal,1=vertical,2=diagRight,3=diagLeft
+    public int player; // 1=player1, 2=player2
+    
+    public SOSInfo(int r1, int c1, int r2, int c2, int r3, int c3, int direction, int player) {
+      this.r1 = r1;
+      this.c1 = c1;
+      this.r2 = r2;
+      this.c2 = c2;
+      this.r3 = r3;
+      this.c3 = c3;
+      this.direction = direction;
+      this.player = player;
+    }
+  }
+
+  private boolean inBounds(int r, int c) {
+    return r >= 0 && r < size && c >= 0 && c < size;
+  }
+
+}
