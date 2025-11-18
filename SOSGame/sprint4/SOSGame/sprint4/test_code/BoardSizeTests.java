@@ -4,8 +4,8 @@ package SOSGame.sprint4.test_code;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import SOSGame.sprint2.production_code.Game;
-import SOSGame.sprint2.test_code.TestGame;
+import SOSGame.sprint4.production_code.Game;
+import SOSGame.sprint4.test_code.TestGame;
 
 public class BoardSizeTests {
   

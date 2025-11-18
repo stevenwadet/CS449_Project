@@ -49,8 +49,8 @@ public class SOSGame implements ActionListener {
   public JRadioButton oLetterButton = new JRadioButton("O");
   JCheckBox recordGame = new JCheckBox("Record Game");
   
-  JLabel p1Label = new JLabel("Player 1:");
-  JLabel p2Label = new JLabel("Player 2:");
+  JLabel p1Label = new JLabel("Blue Player:");
+  JLabel p2Label = new JLabel("Red Player:");
   JLabel diffLabel = new JLabel("Difficulty:");
   
   JComboBox<String> p1Type = new JComboBox<>(new String[]{"Human", "Computer"});

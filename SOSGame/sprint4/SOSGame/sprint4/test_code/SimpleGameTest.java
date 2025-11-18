@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import SOSGame.sprint3.production_code.SimpleGame;
-import SOSGame.sprint3.production_code.Game.MoveResult;
+import SOSGame.sprint4.production_code.SimpleGame;
+import SOSGame.sprint4.production_code.Game.MoveResult;
 
 
 
